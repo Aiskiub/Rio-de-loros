@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Café de especialidad de Mistrató, Risaralda. Elige tu café y pídelo por WhatsApp.">
+<meta property="og:title" content="Café Río de Loros">
+<meta property="og:description" content="Café de origen de Mistrató, Risaralda. Fluye el aroma, canta el sabor.">
+<meta name="theme-color" content="#120a07">
+<title>Café Río de Loros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Oswald:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: full-bleed product stage. Layered scene per product (back leaves and beans, bag, bean mound, front beans),
+   copy on both sides of the bag, product switcher bottom-left. Palette taken from the bag print: teal dashes, brick zigzag, cream paper. */
+:root{
+  --ink:#120a07;
+  --bean:#2b1a12;
+  --cream:#f4e9d4;
+  --teal:#1f7f7b;
+  --teal-lit:#4cc0b6;
+  --brick:#b0432b;
+  --brick-lit:#e0704f;
+  --sun:#f2c230;
+  --bg:var(--ink);
+  --fg:var(--cream);
+  --fg-dim:rgba(244,233,212,.76);
+  --line:rgba(244,233,212,.28);
+  --display:'Oswald','Arial Narrow',Impact,sans-serif;
+  --body:'Lora',Georgia,'Times New Roman',serif;
+  --gutter-l:max(16px,env(safe-area-inset-left,0px));
+  --gutter-r:max(16px,env(safe-area-inset-right,0px));
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
+
+.stage{position:relative;height:100vh;height:100svh;min-height:540px;width:100%;overflow:hidden;--u:min(1vw,1.55vh);background:var(--bg);isolation:isolate}
+.slide{position:absolute;inset:0;visibility:hidden;overflow:hidden}
+.slide.on{visibility:visible}
+
+/* background scene */
+.bg{position:absolute;inset:-4%}
+.bg img{width:100%;height:100%;object-fit:cover;display:block}
+.tint{position:absolute;inset:0;mix-blend-mode:color;background:var(--tint,transparent);opacity:var(--tint-o,0)}
+.glow{position:absolute;inset:0;background:radial-gradient(60% 55% at 50% 42%,var(--glow,rgba(255,230,190,.16)),transparent 70%),radial-gradient(120% 100% at 50% 50%,transparent 55%,rgba(8,4,3,.7) 100%)}
+
+/* giant outlined word */
+.word{position:absolute;left:0;right:0;top:15%;display:flex;justify-content:center;pointer-events:none;z-index:1}
+.word span{display:block;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.02em;line-height:1;white-space:nowrap;
+  font-size:calc(var(--u)*19);color:transparent;-webkit-text-stroke:1.5px rgba(244,233,212,.2)}
+
+/* layers: zero-size anchor, child centred on it */
+.layer,.product,.front-pile{position:absolute;display:flex;align-items:center;justify-content:center;width:0;height:0}
+.layer .in{display:block;flex:none}
+.layer img{display:block;width:calc(var(--w)*var(--u));height:auto;filter:blur(var(--b,0px)) drop-shadow(0 .8vh 1.2vh rgba(0,0,0,.45));opacity:var(--o,1)}
+.z-back{z-index:2}
+.z-front{z-index:5}
+
+.product{left:50%;bottom:19%;align-items:flex-end;z-index:3}
+.product .in{position:relative;flex:none;transform-origin:50% 100%}
+.product img{display:block;height:calc(var(--ph)*1vh);width:auto;max-width:78vw;filter:drop-shadow(0 1.4vh 2.4vh rgba(0,0,0,.4))}
+.product .shadow{position:absolute;left:4%;right:4%;bottom:-1.6vh;height:3.4vh;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(0,0,0,.72),rgba(0,0,0,0));filter:blur(5px);z-index:-1}
+
+.front-pile{left:50%;bottom:-5%;align-items:flex-end;z-index:4}
+.front-pile img{display:block;width:calc(var(--pw)*1vw);max-width:none;height:auto;filter:drop-shadow(0 -.6vh 1.6vh rgba(0,0,0,.5))}
+
+/* copy */
+.col{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;z-index:6;padding-bottom:9vh}
+.col-l{left:0;padding-left:calc(var(--gutter-l) + 4.5vw);width:min(34vw,470px);gap:2.2vh}
+.col-r{right:0;padding-right:calc(var(--gutter-r) + 4.5vw);width:min(26vw,360px);gap:2.4vh;align-items:flex-start}
+.mask{display:block;overflow:hidden;padding-bottom:.08em}
+.mask>span{display:block}
+h2 .mask{white-space:nowrap}
+.eyebrow{font-family:var(--display);font-weight:500;font-size:clamp(12px,calc(var(--u)*1.05),15px);letter-spacing:.24em;text-transform:uppercase;color:var(--sun)}
+.zig{display:block;height:10px;width:min(180px,40%);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath d='M0 8 L5 2 L10 8 L15 2 L20 8' fill='none' stroke='%23e0704f' stroke-width='2' stroke-dasharray='4 2.4'/%3E%3C/svg%3E") repeat-x left center/20px 10px}
+h2{margin:0;font-family:var(--display);font-weight:600;text-transform:uppercase;line-height:.98;letter-spacing:.01em;text-wrap:balance;
+  font-size:clamp(40px,calc(var(--u)*5.4),88px);text-shadow:0 2px 24px rgba(0,0,0,.45)}
+.copy{margin:0;max-width:30ch;font-size:clamp(14px,calc(var(--u)*1.25),18px);line-height:1.55;color:var(--fg-dim);text-shadow:0 1px 14px rgba(0,0,0,.6)}
+.cta{display:inline-flex;align-items:center;gap:.7em;align-self:flex-start;background:var(--cream);color:var(--bean);font-family:var(--display);font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;text-decoration:none;font-size:clamp(13px,calc(var(--u)*1.05),15px);padding:1.05em 1.6em;border-radius:2px;
+  box-shadow:0 0 0 2px var(--cream),0 0 0 4px transparent;transition:background .25s,color .25s,transform .25s}
+.cta:hover{background:var(--sun);transform:translateY(-2px)}
+.cta svg{width:1.2em;height:1.2em;flex:none}
+.label{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--fg-dim)}
+.notes{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.notes li{font-family:var(--display);text-transform:uppercase;letter-spacing:.12em;font-size:13px;padding:.55em .9em;border:1.5px dashed var(--brick-lit);color:var(--cream);background:rgba(18,10,7,.35)}
+dl.facts{margin:0;display:grid;gap:1.4vh}
+dl.facts div{display:grid;gap:2px}
+dl.facts dt{font-family:var(--display);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brick-lit)}
+dl.facts dd{margin:0;font-family:var(--body);font-weight:500;font-size:clamp(14px,calc(var(--u)*1.2),17px);color:var(--cream);text-shadow:0 1px 12px rgba(0,0,0,.6)}
+
+/* chrome */
+.top{position:absolute;left:0;right:0;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:max(2.2vh,14px) var(--gutter-r) max(1.6vh,12px) var(--gutter-l);
+  background:linear-gradient(to bottom,rgba(10,6,4,.7),rgba(10,6,4,0))}
+.brand{display:flex;align-items:baseline;gap:14px;min-width:0}
+.brand b{font-family:var(--display);font-weight:600;font-size:clamp(17px,calc(var(--u)*1.7),24px);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.brand i{font-family:var(--body);font-size:13px;color:var(--fg-dim)}
+.top p{margin:0;font-family:var(--display);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--fg-dim);text-align:right}
+.edge{position:absolute;left:0;right:0;top:0;z-index:19;height:10px;pointer-events:none}
+.bottomfade{position:absolute;left:0;right:0;bottom:0;height:26%;z-index:5;pointer-events:none;background:linear-gradient(to top,rgba(10,6,4,.82),rgba(10,6,4,0))}
+.switch{position:absolute;z-index:20;left:var(--gutter-l);bottom:max(3vh,16px);padding-left:4.5vw;display:flex;gap:clamp(14px,2.4vw,34px)}
+.switch button{position:relative;padding:.9em 0 .7em;font-family:var(--display);font-weight:500;letter-spacing:.2em;text-transform:uppercase;font-size:clamp(12px,calc(var(--u)*1.05),15px);color:var(--fg-dim);transition:color .3s;text-align:left}
+.switch button::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line)}
+.switch button::before{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--sun);transform:scaleX(0);transform-origin:left;transition:transform .6s cubic-bezier(.2,.7,.2,1);z-index:1}
+.switch button[aria-current="true"]{color:var(--cream)}
+.switch button[aria-current="true"]::before{transform:scaleX(1)}
+.switch button:hover{color:var(--cream)}
+.arrow{position:absolute;z-index:20;top:50%;width:48px;height:48px;margin-top:-24px;border:1.5px solid var(--line);border-radius:50%;display:grid;place-items:center;background:rgba(18,10,7,.35);backdrop-filter:blur(4px);transition:border-color .25s,background .25s}
+.arrow:hover{border-color:var(--cream);background:rgba(18,10,7,.6)}
+.arrow svg{width:20px;height:20px}
+.arrow.prev{left:var(--gutter-l)}
+.arrow.next{right:var(--gutter-r)}
+.hint{position:absolute;z-index:20;right:var(--gutter-r);bottom:max(3vh,16px);margin:0;font-family:var(--display);font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--fg-dim);padding-right:4.5vw}
+
+@media (max-width:860px){
+  .col-r,.hint,.word{display:none}
+  .col{justify-content:flex-end;padding-bottom:calc(max(3vh,16px) + 62px)}
+  .col-l{left:0;right:0;width:auto;padding-left:var(--gutter-l);padding-right:var(--gutter-r);gap:1.4vh;align-items:flex-start;text-align:left}
+  .copy{max-width:36ch;font-size:14px}
+  h2{font-size:clamp(34px,10.5vw,52px)}
+  .product{bottom:var(--pb,50%)}
+  .product img{height:min(calc(var(--ph)*var(--pm,.52)*1vh),var(--cap,100vh));max-width:84vw}
+  .copy{display:none}
+  .front-pile{bottom:-1%}
+  .front-pile img{width:calc(var(--pw)*1.5vw)}
+  .z-front{display:none}
+  .layer img{width:calc(var(--w)*var(--u)*1.7)}
+  .switch{padding-left:0}
+  .arrow{top:34%;width:40px;height:40px;margin-top:-20px}
+  .brand i,.top p{display:none}
+  .bottomfade{height:46%}
+}
+@media (prefers-reduced-motion:reduce){.cta,.switch button::before,.tip{transition:none}.btn.nudge{animation:none}}
+
+/* header socials */
+.top-r{display:flex;align-items:center;gap:18px}
+.soc{display:flex;gap:8px}
+.soc a{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);color:var(--cream);transition:border-color .2s,color .2s}
+.soc a:hover{border-color:var(--sun);color:var(--sun)}
+.soc svg{width:18px;height:18px}
+
+/* ---------- lower sections ---------- */
+.wrap{max-width:1180px;margin:0 auto}
+.paper{position:relative;background:var(--cream);color:var(--bean);padding-block:clamp(68px,9vw,124px);padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.paper::before{content:"";position:absolute;left:0;right:0;top:14px;border-top:2px dashed var(--teal)}
+.paper::after{content:"";position:absolute;left:0;right:0;top:24px;height:10px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath d='M0 8 L5 2 L10 8 L15 2 L20 8' fill='none' stroke='%23b0432b' stroke-width='2' stroke-dasharray='4 2.4'/%3E%3C/svg%3E") repeat-x left center/20px 10px}
+.paper .eyebrow{color:var(--brick)}
+.paper h2,.about h2{font-size:clamp(34px,4.6vw,60px);text-shadow:none;margin-top:8px}
+.lede{max-width:54ch;margin:14px 0 0;font-size:clamp(15px,1.5vw,18px);line-height:1.6;color:rgba(43,26,18,.8)}
+.order{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);margin-top:clamp(28px,4vw,48px);align-items:start}
+.builder{display:grid;gap:28px;min-width:0}
+.grp{border:0;margin:0;padding:0;min-width:0}
+.grp legend{display:flex;align-items:center;gap:10px;padding:0;margin-bottom:12px;font-family:var(--display);font-weight:500;letter-spacing:.2em;text-transform:uppercase;font-size:13px;color:var(--bean)}
+.grp legend span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--bean);color:var(--cream);font-size:12px;letter-spacing:0}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.choice{display:grid;justify-items:center;align-content:end;gap:8px;padding:14px 8px 12px;border:2px solid rgba(43,26,18,.16);background:rgba(255,255,255,.4);text-align:center;transition:border-color .2s,background .2s,transform .2s;min-width:0}
+.choice:hover{transform:translateY(-2px)}
+.choice[aria-pressed="true"]{border-color:var(--brick);background:rgba(176,67,43,.09)}
+.choice .pic{position:relative;display:block;height:clamp(96px,13vw,140px);width:100%}
+.choice .pic img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 4px 6px rgba(43,26,18,.3))}
+.choice b{font-family:var(--display);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:14px;white-space:nowrap}
+.choice i{font-style:normal;font-size:12px;color:rgba(43,26,18,.68)}
+.seg{display:inline-flex;border:2px solid var(--bean);max-width:100%}
+.seg button{padding:.85em 1.6em;font-family:var(--display);font-weight:500;letter-spacing:.16em;text-transform:uppercase;font-size:13px;color:var(--bean)}
+.seg button[aria-pressed="true"]{background:var(--bean);color:var(--cream)}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.hintp{margin:8px 0 0;font-size:13px;color:rgba(43,26,18,.7);min-height:1.3em}
+.stepper{display:inline-flex;align-items:stretch;border:2px solid var(--bean)}
+.stepper button{width:50px;min-height:48px;font-size:22px;line-height:1;color:var(--bean)}
+.stepper button:hover{background:rgba(43,26,18,.08)}
+.stepper output{display:grid;place-items:center;min-width:58px;font-family:var(--display);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums}
+.btn{justify-self:start;background:var(--bean);color:var(--cream);font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:14px;padding:1.1em 1.9em;transition:background .2s,transform .2s}
+.btn:hover{background:var(--brick);transform:translateY(-2px)}
+.ticket{position:relative;background:var(--bean);color:var(--cream);padding:clamp(22px,3vw,34px);display:grid;gap:18px;min-width:0}
+.ticket::before{content:"";position:absolute;inset:8px;border:1.5px dashed rgba(244,233,212,.26);pointer-events:none}
+.ticket>*{position:relative}
+.ticket h3{margin:0;font-family:var(--display);font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:22px}
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.lines li{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid rgba(244,233,212,.16)}
+.lines .nm{font-size:15px;min-width:0}
+.lines .nm small{display:block;color:rgba(244,233,212,.7);font-size:13px}
+.mini{display:inline-flex;align-items:center;border:1px solid rgba(244,233,212,.4)}
+.mini button{width:32px;height:32px;font-size:16px}
+.mini button:hover{background:rgba(244,233,212,.12)}
+.mini span{min-width:28px;text-align:center;font-variant-numeric:tabular-nums;font-family:var(--display)}
+.lines .rm{width:32px;height:32px;font-size:20px;color:rgba(244,233,212,.75)}
+.lines .rm:hover{color:var(--sun)}
+.empty-lines{color:rgba(244,233,212,.75);font-size:14px;line-height:1.55;padding:2px 0 6px;border:0!important}
+.cust{display:grid;gap:8px}
+.cust label{font-family:var(--display);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal-lit)}
+.cust input,.cust textarea{width:100%;background:rgba(244,233,212,.08);border:1px solid rgba(244,233,212,.3);color:var(--cream);padding:.75em .9em;font:inherit;font-size:15px;border-radius:0;resize:vertical}
+.cust input::placeholder,.cust textarea::placeholder{color:rgba(244,233,212,.5)}
+.preview .label{display:block;margin-bottom:6px;color:var(--teal-lit)}
+.preview pre{margin:0;white-space:pre-wrap;word-break:break-word;font-family:var(--body);font-size:14px;line-height:1.55;background:rgba(244,233,212,.06);border:1px dashed rgba(244,233,212,.3);padding:12px 14px;color:rgba(244,233,212,.92);max-height:320px;overflow:auto}
+.send{display:flex;align-items:center;justify-content:center;gap:.7em;background:#17655f;border:1.5px solid var(--teal-lit);color:var(--cream);text-decoration:none;font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:15px;padding:1.05em 1.4em;transition:background .2s,transform .2s,opacity .2s}
+.send:hover{background:#1f7f7b;transform:translateY(-2px)}
+.send[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.send[aria-disabled="true"]:hover{background:#17655f;transform:none}
+.sendwrap{position:relative}
+.tip{position:absolute;left:50%;bottom:calc(100% + 12px);z-index:5;width:max-content;max-width:min(300px,86vw);background:var(--cream);color:var(--bean);padding:.8em 1em;font-size:14px;line-height:1.45;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.45);opacity:0;visibility:hidden;transform:translate(-50%,6px);transition:opacity .2s,transform .2s,visibility .2s;pointer-events:none;text-align:center}
+.tip::after{content:"";position:absolute;left:50%;top:100%;margin-left:-7px;border:7px solid transparent;border-top-color:var(--cream)}
+.tip.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+@keyframes nudge{0%,100%{transform:none}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.btn.nudge{outline:3px solid var(--sun);outline-offset:3px;animation:nudge .5s}
+.send svg{width:1.3em;height:1.3em;flex:none}
+.copy-btn{justify-self:start;font-family:var(--display);letter-spacing:.16em;text-transform:uppercase;font-size:12px;border-bottom:1.5px solid var(--cream);padding-bottom:3px}
+.num{margin:0;font-size:13px;color:rgba(244,233,212,.7)}
+
+.about{background:radial-gradient(90% 60% at 82% 0%,rgba(31,127,123,.38),transparent 62%),linear-gradient(#0e2220,var(--ink));color:var(--fg);padding-block:clamp(68px,9vw,132px);padding-left:var(--gutter-l);padding-right:var(--gutter-r)}
+.about-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(28px,5vw,72px);align-items:center}
+.story{margin:18px 0 0;max-width:46ch;font-size:clamp(16px,1.6vw,19px);line-height:1.65;color:var(--fg-dim)}
+.facts2{margin:30px 0 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px;max-width:540px}
+.facts2 div{border-top:1.5px dashed rgba(224,112,79,.6);padding-top:10px;min-width:0}
+.facts2 dt{font-family:var(--display);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--brick-lit);margin-bottom:4px}
+.facts2 dd{margin:0;font-weight:500;font-size:16px;line-height:1.4;color:var(--cream)}
+.photos{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;grid-template-areas:"a b" "a c";min-width:0}
+.ph{position:relative;margin:0;min-height:0;overflow:hidden;background:rgba(244,233,212,.05);border:2px dashed rgba(224,112,79,.55)}
+.ph-a{grid-area:a;min-height:340px}
+.ph-b{grid-area:b;aspect-ratio:4/3}
+.ph-c{grid-area:c;aspect-ratio:4/3}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph-a img{object-position:50% 22%}
+.ph-b img{object-position:50% 55%}
+.ph figcaption{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;font-family:var(--display);font-size:12px;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(to top,rgba(10,6,4,.88),transparent);color:var(--cream);z-index:1}
+.ph .soon{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:16px 16px 44px;font-size:13px;color:var(--fg-dim)}
+.ph.has{border-style:solid;border-color:transparent}
+
+.foot{background:#0a0605;color:var(--fg-dim);padding-block:52px 44px;padding-left:var(--gutter-l);padding-right:var(--gutter-r);border-top:2px dashed rgba(76,192,182,.5)}
+.foot-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:32px}
+.fb{font-family:var(--display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-size:20px;color:var(--cream)}
+.foot p{margin:8px 0 0;font-size:14px;line-height:1.6}
+.soc-l{display:grid;gap:12px;align-content:start;justify-items:start}
+.soc-l a{display:inline-flex;align-items:center;gap:.7em;text-decoration:none;color:var(--cream);font-size:15px}
+.soc-l a:hover{color:var(--sun)}
+.soc-l svg{width:22px;height:22px;flex:none}
+.foot .legal{grid-column:1/-1;font-size:12px;opacity:.8;margin:0}
+
+@media (max-width:860px){
+  .order,.about-grid,.foot-grid{grid-template-columns:minmax(0,1fr)}
+  .photos{grid-template-areas:"a a" "b c";grid-template-columns:1fr 1fr}
+  .ph-a{min-height:0;aspect-ratio:4/5}
+  .ph-b,.ph-c{aspect-ratio:1/1}
+  .facts2{grid-template-columns:minmax(0,1fr)}
+  .top-r{gap:0}
+}
+</style>
+</head>
+<body>
+<main class="stage" id="stage" aria-label="Productos de Café Río de Loros"></main>
+
+<section class="paper" id="pedido" aria-labelledby="pedido-t">
+  <div class="wrap">
+    <p class="eyebrow">Pedidos por WhatsApp</p>
+    <h2 id="pedido-t">Arma tu pedido</h2>
+    <p class="lede">Elige el tamaño, si lo quieres en grano o molido y la cantidad. Al final se abre WhatsApp con el mensaje ya escrito, listo para enviar.</p>
+    <div class="order">
+      <div class="builder">
+        <fieldset class="grp"><legend><span>1</span>Producto</legend><div class="choices" id="choices"></div></fieldset>
+        <fieldset class="grp"><legend><span>2</span>Presentación</legend><div class="seg" id="forms"></div><p class="hintp" id="form-hint"></p></fieldset>
+        <fieldset class="grp"><legend><span>3</span>Cantidad</legend>
+          <div class="stepper"><button type="button" id="q-minus" aria-label="Una unidad menos">−</button><output id="q-val" aria-live="polite">1</output><button type="button" id="q-plus" aria-label="Una unidad más">+</button></div>
+        </fieldset>
+        <button type="button" class="btn" id="add">Agregar al pedido</button>
+      </div>
+      <aside class="ticket" aria-label="Tu pedido">
+        <h3>Tu pedido</h3>
+        <ul class="lines" id="lines" aria-live="polite"></ul>
+        <div class="cust">
+          <label for="c-name">Tu nombre</label>
+          <input id="c-name" type="text" autocomplete="name" placeholder="Ej. María">
+          <label for="c-city">Ciudad y barrio</label>
+          <input id="c-city" type="text" autocomplete="address-level2" placeholder="Ej. Pereira, Cuba">
+          <label for="c-notes">Notas</label>
+          <textarea id="c-notes" rows="2" placeholder="Ej. Molido para cafetera de filtro"></textarea>
+        </div>
+        <div class="preview"><span class="label">Así llegará tu mensaje</span><pre id="preview"></pre></div>
+        <div class="sendwrap"><span class="tip" id="tip" role="status"></span><a class="send" id="send" target="_blank" rel="noopener" href="#" aria-disabled="true"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.200zm4.5-6.1c-.2-.1-1.500-.7-1.700-.8-.2-.1-.4-.1-.6.100l-.8 1c-.1.200-.3.200-.5.100a6.700 6.700 0 0 1-3.300-2.900c-.2-.4.200-.4.700-1.300.1-.2 0-.3 0-.4l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.300 3 3 0 0 0-.9 2.200c0 1.300.9 2.600 1 2.800.1.200 1.800 2.800 4.400 3.900 1.600.7 2.300.8 3.100.6.500-.1 1.500-.6 1.700-1.200.2-.6.200-1.100.2-1.200-.1-.1-.2-.2-.5-.3z"/></svg>Enviar por WhatsApp</a></div>
+        <button type="button" class="copy-btn" id="copy">Copiar mensaje</button>
+        <p class="num">WhatsApp 321 497 6785</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="about" id="nosotros" aria-labelledby="nos-t">
+  <div class="wrap about-grid">
+    <div class="about-text">
+      <p class="eyebrow">Nosotros</p>
+      <h2 id="nos-t">Del Río de Loros a tu taza</h2>
+      <p class="story">Mistrató, nombre de origen Emberá Chamí que significa «Río de Loros», inspira un café nacido entre las montañas de la cordillera Occidental colombiana, a 1.750 m s. n. m.</p>
+      <p class="story">Una expresión auténtica de origen, cultura y biodiversidad, transformada en una experiencia de sabor que honra la esencia de nuestra tierra.</p>
+      <dl class="facts2">
+        <div><dt>Productor</dt><dd>Jhonattan López</dd></div>
+        <div><dt>Finca</dt><dd>La Floresta</dd></div>
+        <div><dt>Origen</dt><dd>Mistrató, Risaralda</dd></div>
+        <div><dt>Variedad</dt><dd>Castillo · Caturra</dd></div>
+        <div><dt>Proceso</dt><dd>Semi-lavado</dd></div>
+        <div><dt>Perfil de taza</dt><dd>Chocolate, caramelo, caña de azúcar, mandarina, naranja, nuez</dd></div>
+      </dl>
+    </div>
+    <div class="photos">
+      <figure class="ph ph-a" data-src="assets/fotos/jhonattan.webp" data-alt="Jhonattan López sonriendo mientras sostiene una prensa francesa con café"><figcaption>Jhonattan López · Productor</figcaption></figure>
+      <figure class="ph ph-b" data-src="assets/fotos/finca-1.webp" data-alt="Casa de la Finca La Floresta con columnas naranjas y flores, rodeada de vegetación"><figcaption>Finca La Floresta, Mistrató</figcaption></figure>
+      <figure class="ph ph-c" data-src="assets/fotos/finca-2.webp" data-alt="Ramas de cafeto cargadas de cerezas rojas y verdes"><figcaption>Del cafetal a la taza</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap foot-grid">
+    <div>
+      <b class="fb">Café Río de Loros</b>
+      <p>Café de origen, 100 % arábica. Mistrató, Risaralda, Colombia.</p>
+    </div>
+    <nav class="soc-l" aria-label="Redes y contacto">
+      <a href="https://www.instagram.com/caferiodeloros/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>Instagram · @caferiodeloros</a>
+      <a href="https://www.facebook.com/caferiodeloros/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5H16l.5-3h-3V8.6c0-.9.3-1.5 1.600-1.500h1.500V4.400c-.3 0-1.200-.1-2.200-.1-2.200 0-3.700 1.300-3.700 3.800v2.400H8.200v3h2.500V21h2.800z"/></svg>Facebook · Café Río de Loros</a>
+      <a href="https://wa.me/573214976785" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.200z"/></svg>WhatsApp · 321 497 6785</a>
+    </nav>
+    <p class="legal">Fabricado y empacado por Café Salma · Calle 16B # 9A-71 local 1, Dosquebradas, Risaralda · Notificación sanitaria No. NAS-0935-2025</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  var WA = 'https://wa.me/573214976785?text=';
+  var SLIDES = [
+    {
+      key:'500', label:'500 g', tint:'#1f8a85', tintO:.92, glow:'rgba(120,235,220,.20)',
+      word:'MISTRATÓ',
+      product:{src:'bag500.webp', ph:66, pm:.8, pb:'calc(max(3vh,16px) + 289px)', cap:'calc(100svh - 390px)', alt:'Bolsa de café Río de Loros semi-lavado de 500 gramos'},
+      pile:{src:'pile_beans.webp', w:78},
+      eyebrow:'500 g · 17,6 oz', title:['Fluye','el aroma'],
+      copy:'Semi-lavado de Mistrató, cultivado a 1.750 metros sobre el nivel del mar. La bolsa para compartir en casa.',
+      notes:['Chocolate','Caramelo','Caña de azúcar'],
+      facts:[['Origen','Mistrató, Risaralda'],['Variedad','Castillo · Caturra'],['Proceso','Semi-lavado']],
+      wa:'Hola, quiero pedir café Río de Loros de 500 g',
+      layers:[
+        {s:'leaf2', x:8, y:13,w:12,r:-30,d:12,b:2.5,o:.8},
+        {s:'leaf1', x:88,y:31,w:10,r:25, d:14,b:2.5,o:.9},
+        {s:'leaf6', x:71,y:12,w:12,r:-10,d:10,b:3.5,o:.75},
+        {s:'bean_d1',x:34,y:20,w:4.2,r:25, d:16},
+        {s:'bean_d3',x:63,y:27,w:3.6,r:-40,d:18},
+        {s:'bean_d5',x:46,y:10,w:3,  r:10, d:20,b:1.5},
+        {s:'bean_d2',x:5, y:80,w:11, r:-25,d:44,b:4.5,f:1},
+        {s:'bean_d4',x:95,y:75,w:10, r:35, d:40,b:4.5,f:1},
+        {s:'cherry1',x:36,y:62,w:6.5,r:-20,d:28,f:1},
+        {s:'cherry3',x:66,y:58,w:7,  r:15, d:30,f:1},
+        {s:'bean_d1',x:72,y:79,w:5,  r:140,d:34,b:2,f:1}
+      ]
+    },
+    {
+      key:'250', label:'250 g', tint:'#b9482c', tintO:.9, glow:'rgba(255,170,120,.22)',
+      word:'CASTILLO',
+      product:{src:'bag250.webp', ph:58, pm:.8, pb:'calc(max(3vh,16px) + 289px)', cap:'calc(100svh - 390px)', alt:'Bolsa de café Río de Loros semi-lavado de 250 gramos'},
+      pile:{src:'pile_beans.webp', w:78},
+      eyebrow:'250 g · 8,8 oz', title:['Canta','el sabor'],
+      copy:'El mismo café de origen en tamaño de prueba. 100 % arábica, en grano o molido.',
+      notes:['Mandarina','Naranja','Nuez'],
+      facts:[['Origen','Mistrató, Risaralda'],['Altura','1.750 m s. n. m.'],['Proceso','Semi-lavado']],
+      wa:'Hola, quiero pedir café Río de Loros de 250 g',
+      layers:[
+        {s:'leaf4', x:9, y:14,w:8, r:-20,d:12,b:2.5,o:.8},
+        {s:'leaf5', x:87,y:27,w:15,r:20, d:14,b:2,o:.9},
+        {s:'leaf3', x:73,y:10,w:9, r:15, d:10,b:3.5,o:.75},
+        {s:'bean_m1',x:33,y:17,w:6,  r:15, d:16},
+        {s:'bean_m3',x:66,y:24,w:6,  r:-10,d:18},
+        {s:'bean_m5',x:46,y:9, w:3.6,r:30, d:20,b:1.5},
+        {s:'bean_m2',x:6, y:78,w:9,  r:-20,d:44,b:4.5,f:1},
+        {s:'bean_m4',x:94,y:78,w:10, r:25, d:40,b:4.5,f:1},
+        {s:'bean_m1',x:71,y:78,w:6.5,r:-30,d:30,f:1},
+        {s:'bean_m5',x:37,y:66,w:5,  r:40, d:30,f:1},
+        {s:'leaf6', x:17,y:91,w:16, r:10, d:42,b:4,f:1,o:.95}
+      ]
+    },
+    {
+      key:'sobre', label:'Sobre 10 g', tint:'', tintO:0, glow:'rgba(255,230,190,.18)',
+      word:'CATURRA',
+      product:{src:'sobre.webp', ph:46, alt:'Sobre individual de café molido Río de Loros de 10 gramos'},
+      pile:{src:'pile_ground.webp', w:58},
+      eyebrow:'Sobre · 10 g', title:['Un río','en tu taza'],
+      copy:'Una porción de café molido, lista para preparar: 10 g de café para 150 ml de agua.',
+      notes:['Chocolate','Naranja','Nuez'],
+      facts:[['Origen','Mistrató, Risaralda'],['Variedad','Castillo · Caturra'],['Preparación','10 g café · 150 ml agua']],
+      wa:'Hola, quiero pedir sobres de café Río de Loros',
+      layers:[
+        {s:'leaf6', x:9, y:13,w:12,r:-15,d:12,b:2.5,o:.8},
+        {s:'leaf3', x:88,y:29,w:9, r:30, d:14,b:2.5,o:.9},
+        {s:'leaf1', x:72,y:11,w:8, r:-25,d:10,b:3.5,o:.7},
+        {s:'bean_l1',x:32,y:16,w:4.2,r:20, d:16},
+        {s:'bean_l3',x:66,y:22,w:3.8,r:-30,d:18},
+        {s:'bean_l5',x:47,y:8, w:3,  r:15, d:20,b:1.5},
+        {s:'bean_l2',x:6, y:80,w:9,  r:-20,d:44,b:4.5,f:1},
+        {s:'bean_l4',x:95,y:76,w:9,  r:30, d:40,b:4.5,f:1},
+        {s:'cherry2',x:38,y:64,w:7,  r:-15,d:28,f:1},
+        {s:'cherry4',x:65,y:60,w:7.5,r:20, d:30,f:1},
+        {s:'bean_l1',x:73,y:80,w:5,  r:120,d:34,b:2,f:1}
+      ]
+    }
+  ];
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stage = document.getElementById('stage');
+  var A = function(n){ return 'assets/' + n + '.webp'; };
+  var ARROW_L = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>';
+  var ARROW_R = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>';
+  var ARROW_DN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v15M6 13l6 6 6-6"/></svg>';
+  var IG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.4" cy="6.6" r="1" fill="currentColor" stroke="none"/></svg>';
+  var FB_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-7.5H16l.5-3h-3V8.6c0-.9.3-1.5 1.6-1.5h1.5V4.4c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v2.4H8.200v3h2.500V21h2.800z"/></svg>';
+  var WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.200zm4.5-6.1c-.2-.1-1.500-.7-1.700-.8-.2-.1-.4-.1-.6.100l-.8 1c-.1.200-.3.200-.5.100a6.700 6.700 0 0 1-3.300-2.900c-.2-.4.200-.4.700-1.300.1-.2 0-.3 0-.4l-.8-1.800c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.300 3 3 0 0 0-.9 2.200c0 1.300.9 2.600 1 2.800.1.200 1.800 2.800 4.400 3.900 1.600.7 2.300.8 3.100.6.500-.1 1.500-.6 1.700-1.200.2-.6.200-1.100.2-1.200-.1-.1-.2-.2-.5-.3z"/></svg>';
+
+  function buildSlide(s, i){
+    var layers = s.layers.map(function(l, k){
+      return '<div class="layer ' + (l.f ? 'z-front' : 'z-back') + '" data-d="' + l.d + '" style="left:' + l.x + '%;top:' + l.y + '%">' +
+        '<span class="in"><img class="fl" data-r="' + l.r + '" alt="" src="' + A(l.s) + '" style="--w:' + l.w + ';--b:' + (l.b || 0) + 'px;--o:' + (l.o || 1) + '"></span></div>';
+    }).join('');
+    var title = s.title.map(function(t){ return '<span class="mask"><span>' + t + '</span></span>'; }).join('');
+    var notes = s.notes.map(function(n){ return '<li>' + n + '</li>'; }).join('');
+    var facts = s.facts.map(function(f){ return '<div><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>'; }).join('');
+    return '<section class="slide" data-i="' + i + '" aria-label="' + s.label + '">' +
+      '<div class="bg" data-d="6"><img alt="" src="' + A('bg') + '"><div class="tint" style="--tint:' + s.tint + ';--tint-o:' + s.tintO + '"></div></div>' +
+      '<div class="glow" style="--glow:' + s.glow + '"></div>' +
+      '<div class="word" data-d="16"><span class="in">' + s.word + '</span></div>' +
+      layers +
+      '<div class="product" data-d="8" style="--ph:' + s.product.ph + (s.product.pm ? ';--pm:' + s.product.pm + ';--pb:' + s.product.pb + ';--cap:' + s.product.cap : '') + '"><div class="in"><span class="shadow"></span><img class="fl" alt="' + s.product.alt + '" src="' + A(s.product.src.replace('.webp','')) + '"></div></div>' +
+      '<div class="front-pile" data-d="22"><span class="in"><img alt="" src="' + A(s.pile.src.replace('.webp','')) + '" style="--pw:' + s.pile.w + '"></span></div>' +
+      '<div class="bottomfade"></div>' +
+      '<div class="col col-l">' +
+        '<span class="mask t"><span class="eyebrow">' + s.eyebrow + '</span></span>' +
+        '<span class="zig t"></span>' +
+        '<h2>' + title + '</h2>' +
+        '<p class="copy t">' + s.copy + '</p>' +
+        '<button type="button" class="cta t" data-pick="' + i + '">Armar mi pedido' + ARROW_DN + '</button>' +
+      '</div>' +
+      '<div class="col col-r">' +
+        '<span class="label t">Perfil de taza</span>' +
+        '<ul class="notes t">' + notes + '</ul>' +
+        '<dl class="facts t">' + facts + '</dl>' +
+      '</div>' +
+    '</section>';
+  }
+
+  stage.innerHTML =
+    SLIDES.map(buildSlide).join('') +
+    '<header class="top"><div class="brand"><b>Café Río de Loros</b><i>Mistrató · Risaralda</i></div>' +
+      '<div class="top-r"><p>Café de especialidad · Colombia</p><div class="soc">' +
+      '<a href="https://www.instagram.com/caferiodeloros/" target="_blank" rel="noopener" aria-label="Instagram de Café Río de Loros">' + IG_ICON + '</a>' +
+      '<a href="https://www.facebook.com/caferiodeloros/" target="_blank" rel="noopener" aria-label="Facebook de Café Río de Loros">' + FB_ICON + '</a>' +
+      '</div></div></header>' +
+    '<button class="arrow prev" aria-label="Producto anterior">' + ARROW_L + '</button>' +
+    '<button class="arrow next" aria-label="Producto siguiente">' + ARROW_R + '</button>' +
+    '<nav class="switch" aria-label="Elegir producto">' +
+      SLIDES.map(function(s, i){ return '<button data-go="' + i + '">' + s.label + '</button>'; }).join('') +
+    '</nav>' +
+    '<p class="hint">Fluye el aroma, canta el sabor</p>';
+
+  var slides = Array.prototype.slice.call(stage.querySelectorAll('.slide'));
+  var navBtns = Array.prototype.slice.call(stage.querySelectorAll('.switch button'));
+  var cur = 0, busy = false, looped = {};
+
+  // initial rotation of every floating piece
+  slides.forEach(function(sl){
+    sl.querySelectorAll('.layer img.fl').forEach(function(im){
+      if (window.gsap) gsap.set(im, {rotation: parseFloat(im.getAttribute('data-r')) || 0});
+    });
+  });
+
+  function setNav(n){
+    navBtns.forEach(function(b, i){ if (i === n) b.setAttribute('aria-current','true'); else b.removeAttribute('aria-current'); });
+  }
+
+  function startLoops(sl, idx){
+    if (reduce || looped[idx] || !window.gsap) return;
+    looped[idx] = true;
+    sl.querySelectorAll('.layer img.fl').forEach(function(im){
+      var big = im.closest('.layer').classList.contains('z-front');
+      gsap.to(im, {
+        y: gsap.utils.random(big ? -22 : -14, big ? 22 : 14),
+        rotation: '+=' + gsap.utils.random(-9, 9),
+        duration: gsap.utils.random(2.6, 4.8), ease:'sine.inOut', repeat:-1, yoyo:true, delay:gsap.utils.random(0, 1.6)
+      });
+    });
+    var p = sl.querySelector('.product img.fl');
+    gsap.to(p, {y:-12, rotation:.7, duration:3.4, ease:'sine.inOut', repeat:-1, yoyo:true});
+    gsap.to(sl.querySelector('.shadow'), {scaleX:.9, opacity:.8, duration:3.4, ease:'sine.inOut', repeat:-1, yoyo:true});
+  }
+
+  function enter(sl, idx, dir){
+    sl.classList.add('on');
+    if (!window.gsap) return;
+    var ts = reduce ? 4 : 1;
+    var tl = gsap.timeline({defaults:{ease:'power3.out'}});
+    tl.timeScale(ts);
+    tl.from(sl.querySelector('.bg'), {opacity:0, scale:1.1, duration:1.5, ease:'power2.out'}, 0)
+      .from(sl.querySelector('.glow'), {opacity:0, duration:1.4}, 0)
+      .from(sl.querySelector('.word .in'), {opacity:0, y:70, duration:1.3}, .1)
+      .from(sl.querySelectorAll('.z-back .in'), {opacity:0, scale:.4, x:dir*140, rotation:dir*50, duration:1.2, stagger:.07}, .15)
+      .from(sl.querySelector('.product .in'), {opacity:0, y:160, scale:.9, rotation:dir*-4, duration:1.2, ease:'power4.out'}, .25)
+      .from(sl.querySelector('.shadow'), {opacity:0, scaleX:.2, duration:1.1}, .5)
+      .from(sl.querySelector('.front-pile .in'), {opacity:0, y:260, duration:1.1}, .3)
+      .from(sl.querySelectorAll('.z-front .in'), {opacity:0, x:dir*340, rotation:dir*120, scale:.6, duration:1.3, stagger:.08}, .4)
+      .from(sl.querySelectorAll('.mask > span'), {yPercent:115, duration:1, stagger:.09}, .55)
+      .from(sl.querySelectorAll('.t:not(.mask)'), {opacity:0, y:22, duration:.9, stagger:.08}, .8)
+      .from(sl.querySelectorAll('h2'), {opacity:0, duration:.1}, .55);
+    startLoops(sl, idx);
+  }
+
+  function exit(sl, dir){
+    if (!window.gsap){ sl.classList.remove('on'); return; }
+    var ts = reduce ? 4 : 1;
+    var tl = gsap.timeline({onComplete:function(){
+      sl.classList.remove('on');
+      gsap.set(sl.querySelectorAll('.in, .bg, .glow, .mask > span, .t, h2'), {clearProps:'opacity,x,y,scale,rotation,yPercent,transform'});
+    }});
+    tl.timeScale(ts);
+    tl.to(sl.querySelectorAll('.z-front .in'), {opacity:0, x:-dir*260, rotation:-dir*80, duration:.7, ease:'power2.in', stagger:.03}, 0)
+      .to(sl.querySelectorAll('.z-back .in'), {opacity:0, x:-dir*100, scale:.7, duration:.7, ease:'power2.in', stagger:.03}, 0)
+      .to(sl.querySelector('.product .in'), {opacity:0, y:-60, scale:.95, duration:.7, ease:'power2.in'}, 0)
+      .to(sl.querySelector('.front-pile .in'), {opacity:0, y:160, duration:.7, ease:'power2.in'}, 0)
+      .to(sl.querySelector('.word .in'), {opacity:0, y:-40, duration:.6}, 0)
+      .to(sl.querySelectorAll('.mask > span'), {yPercent:-115, duration:.6, ease:'power2.in', stagger:.04}, 0)
+      .to(sl.querySelectorAll('.t:not(.mask)'), {opacity:0, y:-14, duration:.5}, 0)
+      .to(sl.querySelector('.bg'), {opacity:0, duration:.9}, .1)
+      .to(sl.querySelector('.glow'), {opacity:0, duration:.9}, .1);
+  }
+
+  function go(n, dir){
+    var total = slides.length;
+    n = (n + total) % total;
+    if (busy || n === cur) return;
+    dir = dir || (n > cur ? 1 : -1);
+    busy = true;
+    var out = slides[cur], inn = slides[n];
+    out.style.zIndex = 1; inn.style.zIndex = 2;
+    setNav(n);
+    exit(out, dir);
+    enter(inn, n, dir);
+    cur = n;
+    setTimeout(function(){ busy = false; }, reduce ? 300 : 1250);
+  }
+
+  navBtns.forEach(function(b){ b.addEventListener('click', function(){ go(parseInt(b.getAttribute('data-go'), 10)); }); });
+  stage.querySelector('.arrow.next').addEventListener('click', function(){ go(cur + 1, 1); });
+  stage.querySelector('.arrow.prev').addEventListener('click', function(){ go(cur - 1, -1); });
+  window.addEventListener('keydown', function(e){
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test((e.target && e.target.tagName) || '')) return;
+    if (e.key === 'ArrowRight') go(cur + 1, 1);
+    if (e.key === 'ArrowLeft') go(cur - 1, -1);
+  });
+  var sx = null;
+  stage.addEventListener('pointerdown', function(e){ if (e.pointerType !== 'mouse') sx = e.clientX; });
+  stage.addEventListener('pointerup', function(e){
+    if (sx === null) return;
+    var dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  });
+
+  // pointer parallax: each layer drifts by its own depth
+  if (!reduce && window.gsap){
+    stage.addEventListener('mousemove', function(e){
+      var nx = (e.clientX / window.innerWidth - .5) * 2;
+      var ny = (e.clientY / window.innerHeight - .5) * 2;
+      slides[cur].querySelectorAll('[data-d]').forEach(function(el){
+        var d = parseFloat(el.getAttribute('data-d'));
+        if (!el._qx){
+          el._qx = gsap.quickTo(el, 'x', {duration:1.3, ease:'power3.out'});
+          el._qy = gsap.quickTo(el, 'y', {duration:1.3, ease:'power3.out'});
+        }
+        el._qx(-nx * d); el._qy(-ny * d * .6);
+      });
+    });
+  }
+
+  stage.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.cta');
+    if (!b) return;
+    window.dispatchEvent(new CustomEvent('rl-pick', {detail: parseInt(b.getAttribute('data-pick'), 10)}));
+  });
+  // stop the hero loops while it is scrolled out of view
+  if ('IntersectionObserver' in window && window.gsap){
+    new IntersectionObserver(function(en){ gsap.globalTimeline.paused(!en[0].isIntersecting); }, {threshold:0}).observe(stage);
+  }
+
+  setNav(0);
+  var first = function(){ enter(slides[0], 0, 1); };
+  var imgs = Array.prototype.slice.call(slides[0].querySelectorAll('img'));
+  var pending = imgs.filter(function(im){ return !im.complete; }).length;
+  if (!pending) first();
+  else {
+    var done = false, fire = function(){ if (!done){ done = true; first(); } };
+    imgs.forEach(function(im){ im.addEventListener('load', function(){ if (--pending <= 0) fire(); }); im.addEventListener('error', function(){ if (--pending <= 0) fire(); }); });
+    setTimeout(fire, 2500);
+  }
+})();
+</script>
+<script>
+/* Order builder: builds the WhatsApp message and opens wa.me with it */
+(function(){
+  var PHONE = '573214976785';
+  var P = [
+    {key:'500',   name:'Bolsa 500 g', pic:'assets/bag500.webp', title:'500 g',      sub:'Bolsa · 17,6 oz',  forms:['Grano','Molido']},
+    {key:'250',   name:'Bolsa 250 g', pic:'assets/bag250.webp', title:'250 g',      sub:'Bolsa · 8,8 oz',   forms:['Grano','Molido']},
+    {key:'sobre', name:'Sobre 10 g',  pic:'assets/sobre.webp',  title:'Sobre 10 g', sub:'Molido · 0,35 oz', forms:['Molido']}
+  ];
+  var sel = 0, form = 'Grano', qty = 1, cart = [];
+  var $ = function(id){ return document.getElementById(id); };
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function renderChoices(){
+    $('choices').innerHTML = P.map(function(p, i){
+      return '<button type="button" class="choice" data-i="' + i + '" aria-pressed="' + (i === sel) + '">' +
+        '<span class="pic"><img alt="" src="' + p.pic + '"></span><b>' + p.title + '</b><i>' + p.sub + '</i></button>';
+    }).join('');
+  }
+  function renderForms(){
+    var allowed = P[sel].forms;
+    $('forms').innerHTML = ['Grano','Molido'].map(function(f){
+      var ok = allowed.indexOf(f) > -1;
+      return '<button type="button" data-f="' + f + '" aria-pressed="' + (f === form) + '"' + (ok ? '' : ' disabled') + '>' + f + '</button>';
+    }).join('');
+    $('form-hint').textContent = allowed.length === 1 ? 'El sobre solo viene molido.' : '';
+  }
+  function renderQty(){ $('q-val').textContent = qty; }
+
+  function addLine(i, f, n){
+    for (var k = 0; k < cart.length; k++){
+      if (cart[k].i === i && cart[k].f === f){ cart[k].n = Math.min(99, cart[k].n + n); return; }
+    }
+    cart.push({i:i, f:f, n:Math.min(99, n)});
+  }
+  function renderCart(){
+    var ul = $('lines');
+    if (!cart.length){
+      ul.innerHTML = '<li class="empty-lines">Todavía no hay productos. Elige uno a la izquierda y pulsa «Agregar al pedido».</li>';
+    } else {
+      ul.innerHTML = cart.map(function(c, k){
+        return '<li><span class="nm">' + P[c.i].name + '<small>' + c.f + '</small></span>' +
+          '<span class="mini"><button type="button" data-k="' + k + '" data-a="-" aria-label="Quitar una unidad de ' + P[c.i].name + '">−</button><span>' + c.n + '</span><button type="button" data-k="' + k + '" data-a="+" aria-label="Agregar una unidad de ' + P[c.i].name + '">+</button></span>' +
+          '<button type="button" class="rm" data-k="' + k + '" data-a="x" aria-label="Quitar ' + P[c.i].name + ' del pedido">×</button></li>';
+      }).join('');
+    }
+    if (cart.length) $('tip').classList.remove('show');
+    renderMsg();
+  }
+  function msg(){
+    var L = ['Hola, quiero hacer un pedido de Café Río de Loros:', ''];
+    if (!cart.length) L.push('(Agrega productos para armar tu pedido)');
+    cart.forEach(function(c){ L.push('• ' + c.n + ' × ' + P[c.i].name + ' · ' + c.f); });
+    var nm = $('c-name').value.trim(), ci = $('c-city').value.trim(), no = $('c-notes').value.trim();
+    if (nm || ci || no) L.push('');
+    if (nm) L.push('Nombre: ' + nm);
+    if (ci) L.push('Ciudad y barrio: ' + ci);
+    if (no) L.push('Notas: ' + no);
+    if (cart.length) L.push('', 'Gracias.');
+    return L.join('\n');
+  }
+  function renderMsg(){
+    var m = msg(), a = $('send');
+    $('preview').textContent = m;
+    if (cart.length){
+      a.href = 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(m);
+      a.setAttribute('aria-disabled', 'false');
+    } else {
+      a.href = '#';
+      a.setAttribute('aria-disabled', 'true');
+    }
+  }
+
+  $('choices').addEventListener('click', function(e){
+    var b = e.target.closest('.choice'); if (!b) return;
+    sel = parseInt(b.getAttribute('data-i'), 10);
+    if (P[sel].forms.indexOf(form) < 0) form = P[sel].forms[0];
+    renderChoices(); renderForms();
+  });
+  $('forms').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b || b.disabled) return;
+    form = b.getAttribute('data-f'); renderForms();
+  });
+  $('q-minus').addEventListener('click', function(){ qty = Math.max(1, qty - 1); renderQty(); });
+  $('q-plus').addEventListener('click', function(){ qty = Math.min(99, qty + 1); renderQty(); });
+  $('add').addEventListener('click', function(){
+    addLine(sel, form, qty); qty = 1; renderQty(); renderCart();
+  });
+  $('lines').addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    var k = parseInt(b.getAttribute('data-k'), 10), a = b.getAttribute('data-a');
+    if (a === '+') cart[k].n = Math.min(99, cart[k].n + 1);
+    if (a === '-') cart[k].n = cart[k].n - 1;
+    if (a === 'x' || cart[k].n < 1) cart.splice(k, 1);
+    renderCart();
+  });
+  ['c-name','c-city','c-notes'].forEach(function(id){ $(id).addEventListener('input', renderMsg); });
+  var tipTimer, scrollTimer;
+  var canHover = window.matchMedia && window.matchMedia('(hover: hover)').matches;
+  function hideTip(){ $('tip').classList.remove('show'); }
+  function nudgeAdd(){
+    var add = $('add');
+    add.classList.remove('nudge'); void add.offsetWidth; add.classList.add('nudge');
+    setTimeout(function(){ add.classList.remove('nudge'); }, 1600);
+  }
+  function showTip(nudge){
+    var t = $('tip');
+    t.textContent = 'Primero elige un producto y pulsa «Agregar al pedido».';
+    t.classList.add('show');
+    clearTimeout(tipTimer); tipTimer = setTimeout(hideTip, 4200);
+    if (!nudge) return;
+    var add = $('add'), r = add.getBoundingClientRect();
+    clearTimeout(scrollTimer);
+    if (r.bottom < 0 || r.top > window.innerHeight){
+      // phone: the add button is a screen above; let the notice be read, then take the person to it
+      scrollTimer = setTimeout(function(){
+        add.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'center'});
+        setTimeout(nudgeAdd, reduce ? 0 : 550);
+      }, 1500);
+    } else nudgeAdd();
+  }
+  var sendBtn = $('send');
+  sendBtn.addEventListener('click', function(e){
+    if (sendBtn.getAttribute('aria-disabled') === 'true'){ e.preventDefault(); showTip(true); }
+  });
+  if (canHover){
+    sendBtn.addEventListener('mouseenter', function(){ if (!cart.length) showTip(false); });
+    sendBtn.addEventListener('mouseleave', hideTip);
+  }
+  sendBtn.addEventListener('focus', function(){ if (!cart.length) showTip(false); });
+  sendBtn.addEventListener('blur', hideTip);
+  $('copy').addEventListener('click', function(){
+    if (!cart.length){ showTip(true); return; }
+    var m = msg(), btn = $('copy');
+    function done(t){ btn.textContent = t; setTimeout(function(){ btn.textContent = 'Copiar mensaje'; }, 1800); }
+    function fallback(){
+      try {
+        var r = document.createRange(); r.selectNodeContents($('preview'));
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        done('Selecciona y copia el texto');
+      } catch (err) { done('No se pudo copiar'); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(m).then(function(){ done('Copiado'); }, fallback);
+    } else fallback();
+  });
+
+  // "Armar mi pedido" in the hero: adds the product on screen and scrolls to the builder
+  window.addEventListener('rl-pick', function(e){
+    var i = e.detail; if (!(i >= 0 && i < P.length)) return;
+    sel = i; form = P[i].forms[0];
+    addLine(i, form, 1);
+    renderChoices(); renderForms(); renderCart();
+    $('pedido').scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'start'});
+  });
+
+  // real photos: each frame shows its photo as soon as the file exists in assets/fotos
+  document.querySelectorAll('.ph').forEach(function(fig){
+    var soon = document.createElement('span');
+    soon.className = 'soon'; soon.textContent = 'Foto pendiente';
+    fig.insertBefore(soon, fig.firstChild);
+    var im = new Image();
+    im.alt = fig.getAttribute('data-alt') || '';
+    im.onload = function(){ fig.classList.add('has'); soon.remove(); fig.insertBefore(im, fig.firstChild); };
+    im.src = fig.getAttribute('data-src');
+  });
+
+  renderChoices(); renderForms(); renderQty(); renderCart();
+})();
+</script>
+</body>
+</html>
