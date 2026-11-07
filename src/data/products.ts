@@ -8,8 +8,15 @@ export const SOCIAL = {
 
 export type Layer = { s: string; x: number; y: number; w: number; r: number; d: number; b?: number; o?: number; f?: 1 };
 
+export type Line = "semi" | "natural";
+export const LINES: { key: Line; label: string }[] = [
+  { key: "semi", label: "Semi-lavado" },
+  { key: "natural", label: "Natural" },
+];
+
 export type Slide = {
   key: string;
+  line: Line;
   label: string;
   tint: string;
   tintO: number;
@@ -20,21 +27,22 @@ export type Slide = {
   eyebrow: string;
   title: [string, string];
   copy: string;
-  notes: string[];
+  notes?: string[]; // empty until the tasting notes of the line are confirmed
   facts: [string, string][];
   layers: Layer[];
 };
 
-const BAG_PB = "calc(max(3vh,16px) + 289px)";
-const BAG_CAP = "calc(100svh - 390px)";
+// --lt: extra room the phone layout reserves for the line selector (0 on desktop)
+const BAG_PB = "calc(max(3vh,16px) + 289px + var(--lt,0px))";
+const BAG_CAP = "calc(100svh - 390px - var(--lt,0px))";
 
 export const SLIDES: Slide[] = [
   {
-    key: "500", label: "500 g", tint: "#1f8a85", tintO: 0.92, glow: "rgba(120,235,220,.20)",
+    key: "semi-500", line: "semi", label: "500 g", tint: "#1f8a85", tintO: 0.92, glow: "rgba(120,235,220,.20)",
     word: "MISTRATÓ",
     product: { src: "bag500", ph: 66, pm: 0.8, pb: BAG_PB, cap: BAG_CAP, alt: "Bolsa de café Río de Loros semi-lavado de 500 gramos" },
     pile: { src: "pile_beans", w: 78 },
-    eyebrow: "500 g · 17,6 oz", title: ["Fluye", "el aroma"],
+    eyebrow: "Semi-lavado · 500 g", title: ["Fluye", "el aroma"],
     copy: "Semi-lavado de Mistrató, cultivado a 1.750 metros sobre el nivel del mar. La bolsa para compartir en casa.",
     notes: ["Chocolate", "Caramelo", "Caña de azúcar"],
     facts: [["Origen", "Mistrató, Risaralda"], ["Variedad", "Castillo · Caturra"], ["Proceso", "Semi-lavado"]],
@@ -53,11 +61,11 @@ export const SLIDES: Slide[] = [
     ],
   },
   {
-    key: "250", label: "250 g", tint: "#b9482c", tintO: 0.9, glow: "rgba(255,170,120,.22)",
+    key: "semi-250", line: "semi", label: "250 g", tint: "#b9482c", tintO: 0.9, glow: "rgba(255,170,120,.22)",
     word: "CASTILLO",
     product: { src: "bag250", ph: 58, pm: 0.8, pb: BAG_PB, cap: BAG_CAP, alt: "Bolsa de café Río de Loros semi-lavado de 250 gramos" },
     pile: { src: "pile_beans", w: 78 },
-    eyebrow: "250 g · 8,8 oz", title: ["Canta", "el sabor"],
+    eyebrow: "Semi-lavado · 250 g", title: ["Canta", "el sabor"],
     copy: "El mismo café de origen en tamaño de prueba. 100 % arábica, en grano o molido.",
     notes: ["Mandarina", "Naranja", "Nuez"],
     facts: [["Origen", "Mistrató, Risaralda"], ["Altura", "1.750 m s. n. m."], ["Proceso", "Semi-lavado"]],
@@ -76,11 +84,11 @@ export const SLIDES: Slide[] = [
     ],
   },
   {
-    key: "sobre", label: "Sobre 10 g", tint: "", tintO: 0, glow: "rgba(255,230,190,.18)",
+    key: "semi-drip", line: "semi", label: "Drip 10 g", tint: "", tintO: 0, glow: "rgba(255,230,190,.18)",
     word: "CATURRA",
-    product: { src: "sobre", ph: 46, alt: "Sobre individual de café molido Río de Loros de 10 gramos" },
+    product: { src: "drip-semi", ph: 46, alt: "Drip individual de café molido Río de Loros semi-lavado de 10 gramos" },
     pile: { src: "pile_ground", w: 58 },
-    eyebrow: "Sobre · 10 g", title: ["Un río", "en tu taza"],
+    eyebrow: "Semi-lavado · Drip 10 g", title: ["Un río", "en tu taza"],
     copy: "Una porción de café molido, lista para preparar: 10 g de café para 150 ml de agua.",
     notes: ["Chocolate", "Naranja", "Nuez"],
     facts: [["Origen", "Mistrató, Risaralda"], ["Variedad", "Castillo · Caturra"], ["Preparación", "10 g café · 150 ml agua"]],
@@ -100,11 +108,54 @@ export const SLIDES: Slide[] = [
   },
 ];
 
-export type Form = "Grano" | "Molido";
-export type OrderProduct = { key: string; name: string; pic: string; title: string; sub: string; forms: Form[] };
+// Natural line. Tasting notes are still to be confirmed by the producer, so none are shown yet.
+const NATURAL_COPY = "Café natural de Mistrató: la cereza se seca entera junto con su grano, para una taza más dulce y frutal.";
+const NATURAL_NOTE = "Grano o molido";
+SLIDES.push(
+  {
+    key: "natural-500", line: "natural", label: "500 g", tint: "#b27a22", tintO: 0.9, glow: "rgba(255,200,120,.22)",
+    word: "NATURAL",
+    product: { src: "nat500", ph: 66, pm: 0.8, pb: BAG_PB, cap: BAG_CAP, alt: "Bolsa de café Río de Loros natural de 500 gramos" },
+    pile: { src: "pile_beans", w: 78 },
+    eyebrow: "Natural · 500 g", title: ["Fluye", "el aroma"],
+    copy: NATURAL_COPY + " La bolsa para compartir en casa.",
+    facts: [["Origen", "Mistrató, Risaralda"], ["Proceso", "Natural"], ["Presentación", NATURAL_NOTE]],
+    layers: SLIDES[1].layers,
+  },
+  {
+    key: "natural-250", line: "natural", label: "250 g", tint: "#7f2c35", tintO: 0.88, glow: "rgba(255,150,130,.22)",
+    word: "NATURAL",
+    product: { src: "nat250", ph: 58, pm: 0.8, pb: BAG_PB, cap: BAG_CAP, alt: "Bolsa de café Río de Loros natural de 250 gramos" },
+    pile: { src: "pile_beans", w: 78 },
+    eyebrow: "Natural · 250 g", title: ["Canta", "el sabor"],
+    copy: NATURAL_COPY + " El tamaño ideal para probarlo.",
+    facts: [["Origen", "Mistrató, Risaralda"], ["Proceso", "Natural"], ["Presentación", NATURAL_NOTE]],
+    layers: SLIDES[0].layers,
+  },
+  {
+    key: "natural-drip", line: "natural", label: "Drip 10 g", tint: "#c26a2e", tintO: 0.85, glow: "rgba(255,190,120,.22)",
+    word: "NATURAL",
+    product: { src: "drip-natural", ph: 46, alt: "Drip individual de café molido Río de Loros natural de 10 gramos" },
+    pile: { src: "pile_ground", w: 58 },
+    eyebrow: "Natural · Drip 10 g", title: ["Un río", "en tu taza"],
+    copy: "Una porción de café natural molido, lista para preparar: 10 g de café para 150 ml de agua.",
+    facts: [["Origen", "Mistrató, Risaralda"], ["Proceso", "Natural"], ["Preparación", "10 g café · 150 ml agua"]],
+    layers: SLIDES[2].layers,
+  },
+);
 
+export type Form = "Grano" | "Molido";
+export type OrderProduct = {
+  key: string; line: Line; process: string; name: string; pic: string; title: string; sub: string; forms: Form[];
+  soon?: boolean; // announced but not on sale yet
+};
+
+// Index 0..4 match SLIDES (the hero's "Armar mi pedido" passes the slide index).
 export const ORDER_PRODUCTS: OrderProduct[] = [
-  { key: "500", name: "Bolsa 500 g", pic: "/assets/bag500.webp", title: "500 g", sub: "Bolsa · 17,6 oz", forms: ["Grano", "Molido"] },
-  { key: "250", name: "Bolsa 250 g", pic: "/assets/bag250.webp", title: "250 g", sub: "Bolsa · 8,8 oz", forms: ["Grano", "Molido"] },
-  { key: "sobre", name: "Sobre 10 g", pic: "/assets/sobre.webp", title: "Sobre 10 g", sub: "Molido · 0,35 oz", forms: ["Molido"] },
+  { key: "semi-500", line: "semi", process: "Semi-lavado", name: "Bolsa 500 g", pic: "/assets/bag500.webp", title: "500 g", sub: "Bolsa · 17,6 oz", forms: ["Grano", "Molido"] },
+  { key: "semi-250", line: "semi", process: "Semi-lavado", name: "Bolsa 250 g", pic: "/assets/bag250.webp", title: "250 g", sub: "Bolsa · 8,8 oz", forms: ["Grano", "Molido"] },
+  { key: "semi-drip", line: "semi", process: "Semi-lavado", name: "Drip 10 g", pic: "/assets/drip-semi.webp", title: "Drip 10 g", sub: "Molido · 0,35 oz", forms: ["Molido"] },
+  { key: "natural-500", line: "natural", process: "Natural", name: "Bolsa 500 g", pic: "/assets/nat500.webp", title: "500 g", sub: "Bolsa · 17,6 oz", forms: ["Grano", "Molido"] },
+  { key: "natural-250", line: "natural", process: "Natural", name: "Bolsa 250 g", pic: "/assets/nat250.webp", title: "250 g", sub: "Bolsa · 8,8 oz", forms: ["Grano", "Molido"] },
+  { key: "natural-drip", line: "natural", process: "Natural", name: "Drip 10 g", pic: "/assets/drip-natural.webp", title: "Drip 10 g", sub: "Molido · 0,35 oz", forms: ["Molido"] },
 ];

@@ -1,12 +1,13 @@
 "use client";
 
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
-import { ORDER_PRODUCTS, type Form } from "@/data/products";
+import { ORDER_PRODUCTS, type Form, type Line } from "@/data/products";
 import type { CartLine, Customer } from "@/lib/whatsapp";
 
 type Ctx = {
   sel: number; form: Form; qty: number; cart: CartLine[]; customer: Customer;
   selectProduct: (i: number) => void;
+  selectLine: (l: Line) => void;
   setForm: (f: Form) => void;
   setQty: (fn: (n: number) => number) => void;
   setCustomer: (patch: Partial<Customer>) => void;
@@ -40,13 +41,21 @@ export function OrderProvider({ children }: { children: ReactNode }) {
   const [customer, setCust] = useState<Customer>({ name: "", city: "", notes: "" });
 
   const selectProduct = useCallback((i: number) => {
+    if (ORDER_PRODUCTS[i].soon) return;
     setSel(i);
     setFormState((f) => (ORDER_PRODUCTS[i].forms.includes(f) ? f : ORDER_PRODUCTS[i].forms[0]));
   }, []);
 
+  // switching process keeps the same size when that size exists in the other line
+  const selectLine = useCallback((l: Line) => {
+    const same = ORDER_PRODUCTS.findIndex((p) => p.line === l && !p.soon && p.name === ORDER_PRODUCTS[sel].name);
+    selectProduct(same >= 0 ? same : ORDER_PRODUCTS.findIndex((p) => p.line === l && !p.soon));
+  }, [sel, selectProduct]);
+
   const value = useMemo<Ctx>(() => ({
     sel, form, qty, cart, customer,
     selectProduct,
+    selectLine,
     setForm: setFormState,
     setQty: (fn) => setQtyState((n) => Math.max(1, Math.min(99, fn(n)))),
     setCustomer: (patch) => setCust((c) => ({ ...c, ...patch })),
@@ -65,7 +74,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       document.getElementById("pedido")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     },
-  }), [sel, form, qty, cart, customer, selectProduct]);
+  }), [sel, form, qty, cart, customer, selectProduct, selectLine]);
 
   return <OrderCtx.Provider value={value}>{children}</OrderCtx.Provider>;
 }

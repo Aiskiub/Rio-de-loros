@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ORDER_PRODUCTS, PHONE_LABEL, type Form } from "@/data/products";
+import { LINES, ORDER_PRODUCTS, PHONE_LABEL, type Form } from "@/data/products";
 import { buildMessage, whatsappUrl } from "@/lib/whatsapp";
 import { useOrder } from "./OrderContext";
 import { WaIcon } from "./icons";
@@ -13,6 +13,7 @@ export default function OrderBuilder() {
   const o = useOrder();
   const { sel, form, qty, cart, customer } = o;
   const allowed = ORDER_PRODUCTS[sel].forms;
+  const line = ORDER_PRODUCTS[sel].line;
   const message = buildMessage(cart, customer);
   const hasItems = cart.length > 0;
 
@@ -81,30 +82,38 @@ export default function OrderBuilder() {
       <div className="wrap">
         <p className="eyebrow">Pedidos por WhatsApp</p>
         <h2 id="pedido-t">Arma tu pedido</h2>
-        <p className="lede">Elige el tamaño, si lo quieres en grano o molido y la cantidad. Al final se abre WhatsApp con el mensaje ya escrito, listo para enviar.</p>
+        <p className="lede">Elige el proceso, el tamaño, si lo quieres en grano o molido y la cantidad. Al final se abre WhatsApp con el mensaje ya escrito, listo para enviar.</p>
         <div className="order">
           <div className="builder">
             <fieldset className="grp">
-              <legend><span>1</span>Producto</legend>
+              <legend><span>1</span>Proceso</legend>
+              <div className="seg">
+                {LINES.map((l) => (
+                  <button key={l.key} type="button" aria-pressed={l.key === line} onClick={() => o.selectLine(l.key)}>{l.label}</button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset className="grp">
+              <legend><span>2</span>Producto</legend>
               <div className="choices">
-                {ORDER_PRODUCTS.map((p, i) => (
-                  <button key={p.key} type="button" className="choice" aria-pressed={i === sel} onClick={() => o.selectProduct(i)}>
-                    <span className="pic"><img alt="" src={p.pic} /></span><b>{p.title}</b><i>{p.sub}</i>
+                {ORDER_PRODUCTS.map((p, i) => p.line !== line ? null : (
+                  <button key={p.key} type="button" className="choice" aria-pressed={i === sel} disabled={p.soon} onClick={() => o.selectProduct(i)}>
+                    <span className="pic">{p.pic ? <img alt="" src={p.pic} /> : <em className="soon">Pronto</em>}</span><b>{p.title}</b><i>{p.sub}</i>
                   </button>
                 ))}
               </div>
             </fieldset>
             <fieldset className="grp">
-              <legend><span>2</span>Presentación</legend>
+              <legend><span>3</span>Presentación</legend>
               <div className="seg">
                 {FORMS.map((f) => (
                   <button key={f} type="button" aria-pressed={f === form} disabled={!allowed.includes(f)} onClick={() => o.setForm(f)}>{f}</button>
                 ))}
               </div>
-              <p className="hintp">{allowed.length === 1 ? "El sobre solo viene molido." : ""}</p>
+              <p className="hintp">{allowed.length === 1 ? "El Drip solo viene molido." : ""}</p>
             </fieldset>
             <fieldset className="grp">
-              <legend><span>3</span>Cantidad</legend>
+              <legend><span>4</span>Cantidad</legend>
               <div className="stepper">
                 <button type="button" aria-label="Una unidad menos" onClick={() => o.setQty((n) => n - 1)}>−</button>
                 <output aria-live="polite">{qty}</output>
@@ -122,7 +131,7 @@ export default function OrderBuilder() {
                 const p = ORDER_PRODUCTS[c.i];
                 return (
                   <li key={`${c.i}-${c.f}`}>
-                    <span className="nm">{p.name}<small>{c.f}</small></span>
+                    <span className="nm">{p.name}<small>{p.process} · {c.f}</small></span>
                     <span className="mini">
                       <button type="button" aria-label={`Quitar una unidad de ${p.name}`} onClick={() => o.change(k, -1)}>−</button>
                       <span>{c.n}</span>

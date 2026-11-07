@@ -2,7 +2,7 @@
 
 import { memo, useEffect, useRef, type CSSProperties } from "react";
 import { gsap } from "gsap";
-import { SLIDES, SOCIAL, type Slide } from "@/data/products";
+import { LINES, SLIDES, SOCIAL, type Slide } from "@/data/products";
 import { useOrder } from "./OrderContext";
 import { ArrowDown, ArrowL, ArrowR, FbIcon, IgIcon } from "./icons";
 
@@ -14,7 +14,7 @@ const SlideScene = memo(function SlideScene({ s, i, onPick }: { s: Slide; i: num
   const productVars: Vars = { "--ph": p.ph };
   if (p.pm) { productVars["--pm"] = p.pm; productVars["--pb"] = p.pb!; productVars["--cap"] = p.cap!; }
   return (
-    <section className={`slide${i === 0 ? " on" : ""}`} data-i={i} aria-label={s.label}>
+    <section className={`slide${i === 0 ? " on" : ""}`} data-i={i} aria-label={`${LINES.find((l) => l.key === s.line)!.label} ${s.label}`}>
       <div className="bg" data-d="6">
         <img alt="" src={A("bg")} />
         <div className="tint" style={{ "--tint": s.tint || "transparent", "--tint-o": s.tintO } as Vars} />
@@ -43,8 +43,12 @@ const SlideScene = memo(function SlideScene({ s, i, onPick }: { s: Slide; i: num
         <button type="button" className="cta t" onClick={() => onPick(i)}>Armar mi pedido<ArrowDown /></button>
       </div>
       <div className="col col-r">
-        <span className="label t">Perfil de taza</span>
-        <ul className="notes t">{s.notes.map((n) => <li key={n}>{n}</li>)}</ul>
+        {s.notes?.length ? (
+          <>
+            <span className="label t">Perfil de taza</span>
+            <ul className="notes t">{s.notes.map((n) => <li key={n}>{n}</li>)}</ul>
+          </>
+        ) : null}
         <dl className="facts t">{s.facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
       </div>
     </section>
@@ -62,7 +66,8 @@ export default function Hero() {
     if (!stage) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const slides = Array.from(stage.querySelectorAll<HTMLElement>(".slide"));
-    const navBtns = Array.from(stage.querySelectorAll<HTMLButtonElement>(".switch button"));
+    const navBtns = Array.from(stage.querySelectorAll<HTMLButtonElement>(".switch button[data-go]"));
+    const lineBtns = Array.from(stage.querySelectorAll<HTMLButtonElement>(".linesel button"));
     const looped: Record<number, boolean> = {};
     let cur = 0, busy = false, busyTimer: number | undefined, sx: number | null = null;
     const timers: number[] = [];
@@ -72,7 +77,11 @@ export default function Hero() {
         gsap.set(im, { rotation: parseFloat(im.dataset.r ?? "0") || 0 });
       }));
 
-      const setNav = (n: number) => navBtns.forEach((b, i) => { if (i === n) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
+      const setNav = (n: number) => {
+        navBtns.forEach((b) => { if (Number(b.dataset.go) === n) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
+        lineBtns.forEach((b) => { if (b.dataset.line === SLIDES[n].line) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current"); });
+        stage.dataset.line = SLIDES[n].line;
+      };
 
       const startLoops = (sl: HTMLElement, idx: number) => {
         if (reduce || looped[idx]) return;
@@ -146,7 +155,16 @@ export default function Hero() {
       };
       const cleanups: (() => void)[] = [];
 
-      navBtns.forEach((b, i) => on(b, "click", () => go(i)));
+      navBtns.forEach((b) => on(b, "click", () => go(Number(b.dataset.go))));
+      // changing process lands on the same size when it exists there
+      lineBtns.forEach((b) => on(b, "click", () => {
+        const line = b.dataset.line;
+        if (SLIDES[cur].line === line) return;
+        const size = SLIDES[cur].label;
+        let t = SLIDES.findIndex((x) => x.line === line && x.label === size);
+        if (t < 0) t = SLIDES.findIndex((x) => x.line === line);
+        go(t, t > cur ? 1 : -1);
+      }));
       on(stage.querySelector<HTMLElement>(".arrow.next")!, "click", () => go(cur + 1, 1));
       on(stage.querySelector<HTMLElement>(".arrow.prev")!, "click", () => go(cur - 1, -1));
       on(window, "keydown", (e: KeyboardEvent) => {
@@ -205,7 +223,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <main className="stage" id="stage" ref={stageRef} aria-label="Productos de Café Río de Loros">
+    <main className="stage" id="stage" ref={stageRef} data-line="semi" aria-label="Productos de Café Río de Loros">
       {SLIDES.map((s, i) => <SlideScene key={s.key} s={s} i={i} onPick={pick} />)}
       <header className="top">
         <div className="brand"><b>Café Río de Loros</b><i>Mistrató · Risaralda</i></div>
@@ -219,9 +237,14 @@ export default function Hero() {
       </header>
       <button type="button" className="arrow prev" aria-label="Producto anterior"><ArrowL /></button>
       <button type="button" className="arrow next" aria-label="Producto siguiente"><ArrowR /></button>
-      <nav className="switch" aria-label="Elegir producto">
-        {SLIDES.map((s, i) => <button key={s.key} type="button" data-go={i}>{s.label}</button>)}
-      </nav>
+      <div className="linesel" role="group" aria-label="Proceso del café">
+        {LINES.map((l) => <button key={l.key} type="button" data-line={l.key} {...(l.key === "semi" ? { "aria-current": "true" } : {})}>{l.label}</button>)}
+      </div>
+      {LINES.map((l) => (
+        <nav key={l.key} className="switch" data-for={l.key} aria-label={`Tamaños ${l.label}`}>
+          {SLIDES.map((s, i) => s.line === l.key ? <button key={s.key} type="button" data-go={i} {...(i === 0 ? { "aria-current": "true" } : {})}>{s.label}</button> : null)}
+        </nav>
+      ))}
       <p className="hint">Fluye el aroma, canta el sabor</p>
     </main>
   );

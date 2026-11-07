@@ -102,3 +102,7 @@
   .facts2{grid-template-columns:minmax(0,1fr)}
   .top-r{gap:0}
 }
+
+/* process selector, announced-but-unavailable product */
+.choice:disabled{opacity:.55;cursor:not-allowed}
+.choice .soon{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-family:var(--font-display);letter-spacing:.2em;text-transform:uppercase;font-size:12px;color:var(--color-brick)}

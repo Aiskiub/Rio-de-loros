@@ -6,7 +6,7 @@ export type Customer = { name: string; city: string; notes: string };
 export function buildMessage(cart: CartLine[], c: Customer): string {
   const L = ["Hola, quiero hacer un pedido de Café Río de Loros:", ""];
   if (!cart.length) L.push("(Agrega productos para armar tu pedido)");
-  cart.forEach((l) => L.push(`• ${l.n} × ${ORDER_PRODUCTS[l.i].name} · ${l.f}`));
+  cart.forEach((l) => L.push(`• ${l.n} × ${ORDER_PRODUCTS[l.i].name} · ${ORDER_PRODUCTS[l.i].process} · ${l.f}`));
   const nm = c.name.trim(), ci = c.city.trim(), no = c.notes.trim();
   if (nm || ci || no) L.push("");
   if (nm) L.push(`Nombre: ${nm}`);

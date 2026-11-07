@@ -109,3 +109,20 @@ dl.facts dd{margin:0;font-family:var(--font-body);font-weight:500;font-size:clam
 .soc a:hover{border-color:var(--color-sun);color:var(--color-sun)}
 .soc svg{width:18px;height:18px}
 
+
+/* process selector (Semi-lavado | Natural) and the per-process size switch */
+.stage[data-line="semi"] .switch[data-for="natural"],
+.stage[data-line="natural"] .switch[data-for="semi"]{display:none}
+.switch button:disabled{opacity:.4;cursor:not-allowed}
+.switch button:disabled:hover{color:var(--fg-dim)}
+.linesel{position:absolute;z-index:21;left:50%;top:clamp(14px,2.6vh,28px);transform:translateX(-50%);display:flex;border:1.5px solid var(--line);border-radius:999px;padding:3px;background:rgba(18,10,7,.4);backdrop-filter:blur(6px)}
+.linesel button{padding:.7em 1.5em;border-radius:999px;font-family:var(--font-display);font-weight:500;letter-spacing:.2em;text-transform:uppercase;font-size:12px;color:var(--fg-dim);transition:background .3s,color .3s;white-space:nowrap}
+.linesel button:hover{color:var(--color-cream)}
+.linesel button[aria-current="true"]{background:var(--color-cream);color:var(--color-bean)}
+@media (max-width:1180px){.top p{display:none}}
+@media (max-width:860px){
+  .stage{--lt:54px}
+  .linesel{top:auto;left:var(--gutter-l);transform:none;bottom:calc(max(3vh,16px) + 46px)}
+  .linesel button{padding:.6em 1.2em;font-size:11px}
+  .col{padding-bottom:calc(max(3vh,16px) + 62px + var(--lt))}
+}

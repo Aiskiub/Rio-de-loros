@@ -1,0 +1,35 @@
+@import "tailwindcss";
+@import "./hero.css";
+@import "./sections.css";
+
+@theme {
+  --color-ink: #120a07;
+  --color-bean: #2b1a12;
+  --color-cream: #f4e9d4;
+  --color-teal: #1f7f7b;
+  --color-teal-lit: #4cc0b6;
+  --color-brick: #b0432b;
+  --color-brick-lit: #e0704f;
+  --color-sun: #f2c230;
+  --font-display: "Oswald Variable", "Arial Narrow", Impact, sans-serif;
+  --font-body: "Lora Variable", Georgia, "Times New Roman", serif;
+}
+
+:root {
+  --bg: var(--color-ink);
+  --fg: var(--color-cream);
+  --fg-dim: rgba(244, 233, 212, 0.76);
+  --line: rgba(244, 233, 212, 0.28);
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: dark;
+}
+
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}

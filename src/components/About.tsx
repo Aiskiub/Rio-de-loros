@@ -8,7 +8,7 @@ const PHOTOS = [
 
 const FACTS: [string, string][] = [
   ["Productor", "Jhonattan López"], ["Finca", "La Floresta"], ["Origen", "Mistrató, Risaralda"],
-  ["Variedad", "Castillo · Caturra"], ["Proceso", "Semi-lavado"],
+  ["Variedad", "Castillo · Caturra"], ["Procesos", "Semi-lavado y Natural"],
   ["Perfil de taza", "Chocolate, caramelo, caña de azúcar, mandarina, naranja, nuez"],
 ];
 
